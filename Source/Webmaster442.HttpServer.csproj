@@ -4,10 +4,7 @@
     <TargetFramework>net5.0</TargetFramework>
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>E:\GIT\Webmaster442.HttpServer\Source\Webmaster442.HttpServer.xml</DocumentationFile>
+    <DocumentationFile>E:\GIT\Webmaster442.HttpServer\Source\bin\Webmaster442.HttpServer.xml</DocumentationFile>
     <WarningsAsErrors>;NU1605;CS1591</WarningsAsErrors>
   </PropertyGroup>
 
