@@ -81,9 +81,9 @@ namespace Webmaster442.HttpServer
                     {
 
                     }
-                    catch (Exception)
+                    catch (ServerException ex)
                     {
-
+                        
                     }
                 }
             }

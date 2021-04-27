@@ -51,11 +51,20 @@ namespace Webmaster442.HttpServer.Internal
                         var methodUrlVersion = line.Split(' ');
                         if (methodUrlVersion.Length != 3)
                         {
-                            throw new InvalidOperationException("Invalid HTTP Request");
+                            throw new ServerException(HttpResponseCode.BadRequest);
                         }
-                        method = Enum.Parse<RequestMethod>(methodUrlVersion[0], true);
+                        if (!Enum.TryParse<RequestMethod>(methodUrlVersion[0], true, out method))
+                            throw new ServerException(HttpResponseCode.BadRequest);
+
+                        if (methodUrlVersion[1].Length > ushort.MaxValue)
+                            throw new ServerException(HttpResponseCode.UriTooLong);
+
                         url = ExtractUrlAndParameters(methodUrlVersion[1], urlParameters);
                         version = methodUrlVersion[2];
+
+                        if (version != "HTTP/1.0" || version != "HTTP/1.1")
+                            throw new ServerException(HttpResponseCode.HTTPVersionNotSupported);
+
                     }
                     else
                     {
@@ -65,13 +74,23 @@ namespace Webmaster442.HttpServer.Internal
                 }
                 while (!string.IsNullOrEmpty(line));
 
-                if (method == RequestMethod.Post
-                    && headers.ContainsKey(KnownHeaders.ContentLength))
+                if (method == RequestMethod.Post)
                 {
-                    size = int.Parse(headers[KnownHeaders.ContentLength]);
-                    if (size > _maxPayload)
+                    if (!headers.ContainsKey(KnownHeaders.ContentLength))
+                        throw new ServerException(HttpResponseCode.LengthRequired);
+
+                    try
                     {
-                        throw new InvalidOperationException("To big request");
+                        checked
+                        {
+                            size = int.Parse(headers[KnownHeaders.ContentLength]);
+                            if (size > _maxPayload)
+                                throw new ServerException(HttpResponseCode.PayloadTooLarge);
+                        }
+                    }
+                    catch (OverflowException)
+                    {
+                        throw new ServerException(HttpResponseCode.PayloadTooLarge);
                     }
 
                     int read = 0;
