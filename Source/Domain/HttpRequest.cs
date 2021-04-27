@@ -11,7 +11,7 @@ namespace Webmaster442.HttpServer.Domain
     /// <summary>
     /// Represents a HTTP Request header
     /// </summary>
-    public record HttpRequest
+    public sealed class HttpRequest
     {
         /// <summary>
         /// Request method
