@@ -30,13 +30,25 @@ namespace Webmaster442.HttpServer
         public Dictionary<HttpResponseCode, string> CustomErrorHandlers { get; init; }
 
         /// <summary>
+        /// Maximum post data size. By default it's set to 25Mb.
+        /// </summary>
+        public int MaxPostSize { get; init; }
+
+        /// <summary>
+        /// If set to true, stack trace is printed to the output
+        /// </summary>
+        public bool DebugMode { get; init; }
+
+        /// <summary>
         /// Creates a new Instance of HttpServerConfiguration
         /// </summary>
         public HttpServerConfiguration()
         {
+            DebugMode = false;
             Port = 8080;
             ListenAdress = IPAddress.Any;
             CustomErrorHandlers = new Dictionary<HttpResponseCode, string>();
+            MaxPostSize = 25 * 1024 * 1024;
         }
     }
 }

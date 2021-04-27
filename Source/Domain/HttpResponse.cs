@@ -15,7 +15,7 @@ namespace Webmaster442.HttpServer.Domain
     {
         private static byte[] end = Encoding.UTF8.GetBytes("\n\n");
 
-        private NetworkStream? stream;
+        private NetworkStream? _stream;
 
         /// <summary>
         /// Response code
@@ -35,8 +35,9 @@ namespace Webmaster442.HttpServer.Domain
         /// <summary>
         /// Creates a new instance of HttpResponse
         /// </summary>
-        public HttpResponse()
+        internal HttpResponse(NetworkStream networkStream)
         {
+            _stream = networkStream;
             ContentType = "text/plain";
             AdditionalHeaders = new Dictionary<string, string>();
             ResponseCode = HttpResponseCode.Ok;
@@ -45,10 +46,10 @@ namespace Webmaster442.HttpServer.Domain
         /// <inheritdoc/>
         public void Dispose()
         {
-            if (stream != null)
+            if (_stream != null)
             {
-                stream.Dispose();
-                stream = null;
+                _stream.Dispose();
+                _stream = null;
             }
         }
 
@@ -75,12 +76,12 @@ namespace Webmaster442.HttpServer.Domain
         {
             var txt = Encoding.UTF8.GetBytes(text);
             var headers = Encoding.UTF8.GetBytes(PrepareHeaders(txt.Length));
-            if (stream != null)
+            if (_stream != null)
             {
 #pragma warning disable RCS1090 // Add call to 'ConfigureAwait' (or vice versa).
-                await stream.WriteAsync(headers);
-                await stream.WriteAsync(txt);
-                await stream.WriteAsync(end);
+                await _stream.WriteAsync(headers);
+                await _stream.WriteAsync(txt);
+                await _stream.WriteAsync(end);
 #pragma warning restore RCS1090 // Add call to 'ConfigureAwait' (or vice versa).
             }
         }
@@ -93,12 +94,12 @@ namespace Webmaster442.HttpServer.Domain
         public async Task Write(Stream data)
         {
             var headers = Encoding.UTF8.GetBytes(PrepareHeaders(data.Length));
-            if (stream != null)
+            if (_stream != null)
             {
 #pragma warning disable RCS1090 // Add call to 'ConfigureAwait' (or vice versa).
-                await stream.WriteAsync(headers);
-                await data.CopyToAsync(stream);
-                await stream.WriteAsync(end);
+                await _stream.WriteAsync(headers);
+                await data.CopyToAsync(_stream);
+                await _stream.WriteAsync(end);
 #pragma warning restore RCS1090 // Add call to 'ConfigureAwait' (or vice versa).
             }
         }
@@ -111,12 +112,12 @@ namespace Webmaster442.HttpServer.Domain
         public async Task Write(byte[] data)
         {
             var headers = Encoding.UTF8.GetBytes(PrepareHeaders(data.Length));
-            if (stream != null)
+            if (_stream != null)
             {
 #pragma warning disable RCS1090 // Add call to 'ConfigureAwait' (or vice versa).
-                await stream.WriteAsync(headers);
-                await stream.WriteAsync(data, 0, data.Length);
-                await stream.WriteAsync(end);
+                await _stream.WriteAsync(headers);
+                await _stream.WriteAsync(data, 0, data.Length);
+                await _stream.WriteAsync(end);
 #pragma warning restore RCS1090 // Add call to 'ConfigureAwait' (or vice versa).
             }
         }

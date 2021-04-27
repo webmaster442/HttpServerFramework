@@ -37,7 +37,7 @@ namespace Webmaster442.HttpServer.Internal
             byte[] data = Array.Empty<byte>();
             int size = 0;
 
-            using (var reader = new StreamReader(stream, leaveOpen: true, bufferSize: 1))
+            using (var reader = new StreamReader(stream, leaveOpen: true))
             {
                 do
                 {

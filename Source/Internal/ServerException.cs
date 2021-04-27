@@ -4,7 +4,6 @@
 // -----------------------------------------------------------------------------------------------
 
 using System;
-using System.Runtime.Serialization;
 using Webmaster442.HttpServer.Domain;
 
 namespace Webmaster442.HttpServer
@@ -15,9 +14,7 @@ namespace Webmaster442.HttpServer
     [Serializable]
     internal class ServerException: Exception
     {
-        public ServerException()
-        {
-        }
+        public HttpResponseCode ResponseCode { get; }
 
         /// <summary>
         /// Creates a new instance of server exception
@@ -25,19 +22,7 @@ namespace Webmaster442.HttpServer
         /// <param name="responseCode">Response code describing the issue</param>
         public ServerException(HttpResponseCode responseCode) : base($"{(int)responseCode}: {responseCode}")
         {
-
-        }
-
-        public ServerException(string? message) : base(message)
-        {
-        }
-
-        public ServerException(string? message, Exception? innerException) : base(message, innerException)
-        {
-        }
-
-        protected ServerException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
+            ResponseCode = responseCode;
         }
     }
 }

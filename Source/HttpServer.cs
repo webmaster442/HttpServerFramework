@@ -4,8 +4,11 @@
 // -----------------------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using Webmaster442.HttpServer.Domain;
+using Webmaster442.HttpServer.Internal;
 
 namespace Webmaster442.HttpServer
 {
@@ -18,6 +21,7 @@ namespace Webmaster442.HttpServer
         private readonly IServerLog? _log;
         private bool _canRun;
         private readonly HttpServerConfiguration _configuration;
+        private readonly List<IRequestHandler> _handlers;
 
 
         /// <summary>
@@ -29,6 +33,16 @@ namespace Webmaster442.HttpServer
         {
             _configuration = configuration;
             _log = log;
+            _handlers = new List<IRequestHandler>();
+        }
+
+        /// <summary>
+        /// Add a handler that can process requests to the server
+        /// </summary>
+        /// <param name="handler">Request handler</param>
+        public void RegisterHandler(IRequestHandler handler)
+        {
+            _handlers.Add(handler);
         }
 
         /// <inheritdoc/>
@@ -36,6 +50,13 @@ namespace Webmaster442.HttpServer
         {
             Stop();
             _listner = null;
+            foreach (var handler in _handlers)
+            {
+                if (handler is IDisposable disposable)
+                {
+                    disposable.Dispose();
+                }
+            }
         }
 
         /// <summary>
@@ -45,6 +66,9 @@ namespace Webmaster442.HttpServer
         public async void Start()
 #pragma warning restore S3168 // "async" methods should not return "void"
         {
+            if (_handlers.Count < 1)
+                throw new InvalidOperationException("No request handlers are configured");
+
             _listner?.Start();
             while (_canRun && _listner != null)
             {
@@ -73,20 +97,56 @@ namespace Webmaster442.HttpServer
         private async Task HandleClient(TcpClient client)
         {
             await Task.Yield();
+            var parser = new RequestParser(_configuration.MaxPostSize);
             using (client)
             {
-                using (var stream = client.GetStream())
+                using var stream = client.GetStream();
+                HttpResponse response = new HttpResponse(stream);
+                try
                 {
-                    try
+                    HttpRequest request = parser.ParseRequest(stream);
+
+                    bool wasHandled = false;
+                    foreach (var handler in _handlers)
                     {
+                        bool result = await handler.Handle(_log, request, response);
+                        if (result)
+                        {
+                            wasHandled = true;
+                            break;
+                        }
+                    }
+
+                    if (!wasHandled)
+                    {
+                        throw new ServerException(HttpResponseCode.NotFound);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    if (ex is ServerException serverException)
+                    {
+                        //Handle it correctly
+                        ServeErrorHandler(response);
 
                     }
-                    catch (ServerException ex)
+                    else
                     {
-                        
+                        ServeInternalServerError(response);
+                        //internal server error
                     }
                 }
             }
+        }
+
+        private void ServeInternalServerError(HttpResponse response)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void ServeErrorHandler(HttpResponse response)
+        {
+            throw new NotImplementedException();
         }
     }
 }
