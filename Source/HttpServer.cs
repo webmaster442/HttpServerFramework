@@ -126,27 +126,47 @@ namespace Webmaster442.HttpServer
                 {
                     if (ex is ServerException serverException)
                     {
-                        //Handle it correctly
-                        ServeErrorHandler(response);
+                        await ServeErrorHandler(response, serverException.ResponseCode);
 
                     }
                     else
                     {
-                        ServeInternalServerError(response);
-                        //internal server error
+                        await ServeInternalServerError(response, ex);
                     }
                 }
             }
         }
 
-        private void ServeInternalServerError(HttpResponse response)
+        private async Task ServeInternalServerError(HttpResponse response, Exception ex)
         {
-            throw new NotImplementedException();
+            HtmlBuilder builder = new HtmlBuilder("Internal server error");
+            builder.AppendParagraph("Internal server error happened");
+            if (_configuration.DebugMode)
+            {
+                builder.AppendHr();
+                builder.AppendParagraph($"Message: {ex.Message}");
+                builder.AppendParagraph("Stack trace:");
+                builder.AppendPre(ex.StackTrace ?? "");
+            }
+            await response.Write(builder.ToString());
         }
 
-        private void ServeErrorHandler(HttpResponse response)
+        private async Task ServeErrorHandler(HttpResponse response, HttpResponseCode responseCode)
         {
-            throw new NotImplementedException();
+            response.ResponseCode = responseCode;
+            response.ContentType = "text/html";
+            if (_configuration.CustomErrorHandlers.ContainsKey(responseCode))
+            {
+                await response.Write(_configuration.CustomErrorHandlers[responseCode]);
+            }
+            else
+            {
+                HtmlBuilder builder = new HtmlBuilder(responseCode.ToString());
+                builder.AppendHeader(1, $"{(int)responseCode} - {responseCode}");
+                builder.AppendHr();
+                builder.AppendParagraph($"More info about this issue <a href=\"https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/{(int)responseCode}\">can be found here</a>");
+                await response.Write(builder.ToString());
+            }
         }
     }
 }

@@ -45,6 +45,11 @@ namespace Webmaster442.HttpServer.Internal
             AppendElement($"h{level}", text);
         }
 
+        internal void AppendHr()
+        {
+            _content.Append("<hr/>");
+        }
+
         public void AppendPre(string text)
         {
             AppendElement("pre", text);
