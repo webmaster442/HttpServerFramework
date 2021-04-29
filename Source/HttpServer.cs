@@ -77,13 +77,18 @@ namespace Webmaster442.HttpServer
         /// <summary>
         /// Starts listening for connections and serving them
         /// </summary>
-#pragma warning disable S3168 // "async" methods should not return "void"
-        public async void Start()
-#pragma warning restore S3168 // "async" methods should not return "void"
+        public void Start()
         {
             if (_handlers.Count < 1)
                 throw new InvalidOperationException("No request handlers are configured");
+            StartPrivate();
+        }
 
+
+#pragma warning disable S3168 // "async" methods should not return "void"
+        private async void StartPrivate()
+#pragma warning restore S3168 // "async" methods should not return "void"
+        {
             _listner?.Start();
             while (_canRun && _listner != null)
             {
