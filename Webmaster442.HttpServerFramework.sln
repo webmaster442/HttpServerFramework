@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.6.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Webmaster442.HttpServer", "Source\Webmaster442.HttpServer.csproj", "{C348EA75-F3FF-4F54-B51B-25E9F2C91AC8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Webmaster442.HttpServerFramework", "Source\Webmaster442.HttpServerFramework.csproj", "{C348EA75-F3FF-4F54-B51B-25E9F2C91AC8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Webmaster442.HttpServer.Tests", "Tests\Webmaster442.HttpServer.Tests.csproj", "{B38E7D6D-9BE3-420C-9865-A7A9D876C74C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Webmaster442.HttpServerFramework.Tests", "Tests\Webmaster442.HttpServerFramework.Tests.csproj", "{B38E7D6D-9BE3-420C-9865-A7A9D876C74C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
