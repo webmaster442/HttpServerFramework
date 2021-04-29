@@ -25,6 +25,11 @@ namespace Webmaster442.HttpServer
         private readonly HttpServerConfiguration _configuration;
         private readonly List<IRequestHandler> _handlers;
 
+        /// <summary>
+        /// Predicate that can be used to impelement whitelist or blaclist
+        /// based on TcpClient information
+        /// </summary>
+        public Predicate<TcpClient>? ClientFilteringPredicate { get; set; }
 
         /// <summary>
         /// Creates a new instance of HttpServer
@@ -84,10 +89,22 @@ namespace Webmaster442.HttpServer
             {
                 try
                 {
-                    var client = await _listner.AcceptTcpClientAsync();
+                    TcpClient client = await _listner.AcceptTcpClientAsync();
+
+                    if (ClientFilteringPredicate != null)
+                    {
+                        _log?.Info("Running {0} ...", nameof(ClientFilteringPredicate));
+                        bool canHandle = ClientFilteringPredicate?.Invoke(client) ?? false;
+                        if (!canHandle)
+                        {
+                            _log?.Warning("{0} returned false. Refusing client connection", nameof(ClientFilteringPredicate));
+                            client?.Dispose();
+                        }
+                    }
+                   
                     if (_clientsSemaphore?.WaitOne(100) == true)
                     {
-                        await HandleClient(client);
+                        await HandleClient(client!);
                         _clientsSemaphore.Release();
                     }
                     else
