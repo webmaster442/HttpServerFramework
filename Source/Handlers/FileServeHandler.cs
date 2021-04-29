@@ -5,9 +5,9 @@
 
 using System.IO;
 using System.Threading.Tasks;
-using Webmaster442.HttpServer.Domain;
+using Webmaster442.HttpServerFramework.Domain;
 
-namespace Webmaster442.HttpServer.Handlers
+namespace Webmaster442.HttpServerFramework.Handlers
 {
     /// <summary>
     /// Basic file handler.

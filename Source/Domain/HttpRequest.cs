@@ -6,7 +6,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Webmaster442.HttpServer.Domain
+namespace Webmaster442.HttpServerFramework.Domain
 {
     /// <summary>
     /// Represents a HTTP Request header

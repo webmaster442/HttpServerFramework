@@ -3,7 +3,7 @@
 // This is free software under the terms of the MIT License. https://opensource.org/licenses/MIT
 // -----------------------------------------------------------------------------------------------
 
-namespace Webmaster442.HttpServer.Domain
+namespace Webmaster442.HttpServerFramework.Domain
 {
     /// <summary>
     /// Represents available HTTP response codes

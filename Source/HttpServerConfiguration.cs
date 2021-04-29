@@ -5,9 +5,9 @@
 
 using System.Collections.Generic;
 using System.Net;
-using Webmaster442.HttpServer.Domain;
+using Webmaster442.HttpServerFramework.Domain;
 
-namespace Webmaster442.HttpServer
+namespace Webmaster442.HttpServerFramework
 {
     /// <summary>
     /// Represents the HTTP server configuration

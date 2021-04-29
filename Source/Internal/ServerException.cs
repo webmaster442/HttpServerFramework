@@ -4,9 +4,9 @@
 // -----------------------------------------------------------------------------------------------
 
 using System;
-using Webmaster442.HttpServer.Domain;
+using Webmaster442.HttpServerFramework.Domain;
 
-namespace Webmaster442.HttpServer
+namespace Webmaster442.HttpServerFramework
 {
     /// <summary>
     /// Represents a server exception

@@ -9,9 +9,9 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
-using Webmaster442.HttpServer.Domain;
+using Webmaster442.HttpServerFramework.Domain;
 
-namespace Webmaster442.HttpServer.Internal
+namespace Webmaster442.HttpServerFramework.Internal
 {
     internal class RequestParser
     {

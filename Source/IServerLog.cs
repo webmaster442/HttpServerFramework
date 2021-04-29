@@ -5,7 +5,7 @@
 
 using System;
 
-namespace Webmaster442.HttpServer
+namespace Webmaster442.HttpServerFramework
 {
     /// <summary>
     /// Logging interface for the server

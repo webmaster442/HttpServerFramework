@@ -6,7 +6,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Webmaster442.HttpServer
+namespace Webmaster442.HttpServerFramework
 {
     /// <summary>
     /// Provides mime type resolving functions

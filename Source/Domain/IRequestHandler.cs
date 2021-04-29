@@ -5,7 +5,7 @@
 
 using System.Threading.Tasks;
 
-namespace Webmaster442.HttpServer.Domain
+namespace Webmaster442.HttpServerFramework.Domain
 {
     /// <summary>
     /// Request handler interface

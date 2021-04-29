@@ -8,10 +8,10 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using Webmaster442.HttpServer.Domain;
-using Webmaster442.HttpServer.Internal;
+using Webmaster442.HttpServerFramework.Domain;
+using Webmaster442.HttpServerFramework.Internal;
 
-namespace Webmaster442.HttpServer
+namespace Webmaster442.HttpServerFramework
 {
     /// <summary>
     /// A Http server

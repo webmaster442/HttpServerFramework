@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace Webmaster442.HttpServer.Internal
+namespace Webmaster442.HttpServerFramework.Internal
 {
     internal class HtmlBuilder
     {

@@ -5,7 +5,7 @@
 
 using System;
 
-namespace Webmaster442.HttpServer.Internal
+namespace Webmaster442.HttpServerFramework.Internal
 {
     internal static class ConfigurationValidator
     {
