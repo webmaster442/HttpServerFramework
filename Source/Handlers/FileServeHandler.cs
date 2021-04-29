@@ -80,6 +80,7 @@ namespace Webmaster442.HttpServer.Handlers
                 {
                     using (var stream = File.OpenRead(fileOnDisk))
                     {
+                        log?.Info("Serving {1}...", request.Url);
                         response.ContentType = MimeTypes.GetMimeTypeForFile(fileOnDisk);
                         await response.Write(stream);
                     }

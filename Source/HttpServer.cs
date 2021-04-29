@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 using Webmaster442.HttpServer.Domain;
 using Webmaster442.HttpServer.Internal;
@@ -18,6 +19,7 @@ namespace Webmaster442.HttpServer
     public sealed class HttpServer : IDisposable
     {
         private TcpListener? _listner;
+        private Semaphore? _clientsSemaphore;
         private readonly IServerLog? _log;
         private bool _canRun;
         private readonly HttpServerConfiguration _configuration;
@@ -31,9 +33,12 @@ namespace Webmaster442.HttpServer
         /// <param name="log">logger to use</param>
         public HttpServer(HttpServerConfiguration configuration, IServerLog? log = null)
         {
+            ConfigurationValidator.ValidateAndTrhowExceptions(configuration);
+
             _configuration = configuration;
             _log = log;
             _handlers = new List<IRequestHandler>();
+            _clientsSemaphore = new Semaphore(0, _configuration.MaxClients);
         }
 
         /// <summary>
@@ -48,6 +53,11 @@ namespace Webmaster442.HttpServer
         /// <inheritdoc/>
         public void Dispose()
         {
+            if (_clientsSemaphore != null)
+            {
+                _clientsSemaphore.Dispose();
+                _clientsSemaphore = null;
+            }
             Stop();
             _listner = null;
             foreach (var handler in _handlers)
@@ -75,7 +85,16 @@ namespace Webmaster442.HttpServer
                 try
                 {
                     var client = await _listner.AcceptTcpClientAsync();
-                    await HandleClient(client);
+                    if (_clientsSemaphore?.WaitOne(100) == true)
+                    {
+                        await HandleClient(client);
+                        _clientsSemaphore.Release();
+                    }
+                    else
+                    {
+                        client?.Dispose();
+                        _log?.Warning("Maximum number of clients ({0}) reached. Refusing connection", _configuration.MaxClients);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -126,11 +145,13 @@ namespace Webmaster442.HttpServer
                 {
                     if (ex is ServerException serverException)
                     {
+                        _log?.Warning(serverException.Message);
                         await ServeErrorHandler(response, serverException.ResponseCode);
 
                     }
                     else
                     {
+                        _log?.Critical(ex);
                         await ServeInternalServerError(response, ex);
                     }
                 }

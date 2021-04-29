@@ -25,5 +25,12 @@ namespace Webmaster442.HttpServer
         /// <param name="format">Message, a fomat string that can be handled by the String.Format method</param>
         /// <param name="args">Arguments for formatting</param>
         void Info(string format, params object[] args);
+
+        /// <summary>
+        /// Log a warning message
+        /// </summary>
+        /// <param name="format">Message, a fomat string that can be handled by the String.Format method</param>
+        /// <param name="args">Arguments for formatting</param>
+        void Warning(string format, params object[] args);
     }
 }

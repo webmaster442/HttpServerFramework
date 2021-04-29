@@ -17,7 +17,7 @@ namespace Webmaster442.HttpServer
         /// <summary>
         /// Listen port. If Not changed, the default is 8080
         /// </summary>
-        public short Port { get; init; }
+        public ushort Port { get; init; }
 
         /// <summary>
         /// Listen Adress. Default is Any.
@@ -40,6 +40,11 @@ namespace Webmaster442.HttpServer
         public bool DebugMode { get; init; }
 
         /// <summary>
+        /// Maximum number of clients that are handled simultaniously. By default it's set to 10
+        /// </summary>
+        public int MaxClients { get; init; }
+
+        /// <summary>
         /// Creates a new Instance of HttpServerConfiguration
         /// </summary>
         public HttpServerConfiguration()
@@ -49,6 +54,7 @@ namespace Webmaster442.HttpServer
             ListenAdress = IPAddress.Any;
             CustomErrorHandlers = new Dictionary<HttpResponseCode, string>();
             MaxPostSize = 25 * 1024 * 1024;
+            MaxClients = 10;
         }
     }
 }
