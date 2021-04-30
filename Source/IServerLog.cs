@@ -4,6 +4,7 @@
 // -----------------------------------------------------------------------------------------------
 
 using System;
+using System.Diagnostics;
 
 namespace Webmaster442.HttpServerFramework
 {
@@ -16,7 +17,12 @@ namespace Webmaster442.HttpServerFramework
         /// Log a critical exception.
         /// </summary>
         /// <param name="ex">Exception to log</param>
-        void Critical(Exception ex);
+        void Critical(Exception ex)
+        {
+            Debug.WriteLine("Critical:");
+            Debug.WriteLine(ex);
+            Debug.WriteLine(ex.StackTrace);
+        }
 
         /// <summary>
         /// Log an iformational message.
@@ -24,13 +30,21 @@ namespace Webmaster442.HttpServerFramework
         /// </summary>
         /// <param name="format">Message, a fomat string that can be handled by the String.Format method</param>
         /// <param name="args">Arguments for formatting</param>
-        void Info(string format, params object[] args);
+        void Info(string format, params object[] args)
+        {
+            Debug.WriteLine("Info:");
+            Debug.WriteLine(format, args);
+        }
 
         /// <summary>
         /// Log a warning message
         /// </summary>
         /// <param name="format">Message, a fomat string that can be handled by the String.Format method</param>
         /// <param name="args">Arguments for formatting</param>
-        void Warning(string format, params object[] args);
+        void Warning(string format, params object[] args)
+        {
+            Debug.WriteLine("Warning:");
+            Debug.WriteLine(format, args);
+        }
     }
 }
