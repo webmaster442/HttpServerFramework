@@ -1,10 +1,16 @@
-﻿using System;
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) 2021 Ruzsinszki Gábor
+// This is free software under the terms of the MIT License. https://opensource.org/licenses/MIT
+// -----------------------------------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace Webmaster442.HttpServerFramework.Domain
 {
@@ -132,8 +138,23 @@ namespace Webmaster442.HttpServerFramework.Domain
         public async Task WriteJson<T>(T input, JsonSerializerOptions? options = null)
         {
             string serialized = JsonSerializer.Serialize(input, options);
-            ContentType = "text/json";
+            ContentType = "application/json";
             await Write(serialized);
+        }
+        /// <summary>
+        /// Write data as XML
+        /// </summary>
+        /// <param name="serializer">XML serializer to use for the data</param>
+        /// <param name="data">Data to write</param>
+        /// <returns>an awaitable task</returns>
+        public async Task WriteXml(XmlSerializer serializer, object data)
+        {
+            ContentType = "application/xml";
+            using (var ms = new MemoryStream())
+            {
+                serializer.Serialize(ms, data);
+                await Write(ms);
+            }
         }
     }
 }

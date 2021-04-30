@@ -56,7 +56,6 @@ namespace Webmaster442.HttpServerFramework.Handlers
 
             if (result)
             {
-                response.ContentType = "application/json";
                 await response.WriteJson(responseObject);
             }
 
