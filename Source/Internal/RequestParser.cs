@@ -62,7 +62,7 @@ namespace Webmaster442.HttpServerFramework.Internal
                         url = ExtractUrlAndParameters(methodUrlVersion[1], urlParameters);
                         version = methodUrlVersion[2];
 
-                        if (version != "HTTP/1.0" || version != "HTTP/1.1")
+                        if (version != "HTTP/1.0" && version != "HTTP/1.1")
                             throw new ServerException(HttpResponseCode.HTTPVersionNotSupported);
 
                     }

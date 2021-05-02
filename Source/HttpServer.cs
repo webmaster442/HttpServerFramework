@@ -6,7 +6,6 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
-using System.Threading;
 using System.Threading.Tasks;
 using Webmaster442.HttpServerFramework.Domain;
 using Webmaster442.HttpServerFramework.Internal;
@@ -19,11 +18,12 @@ namespace Webmaster442.HttpServerFramework
     public sealed class HttpServer : IDisposable
     {
         private TcpListener? _listner;
-        private Semaphore? _clientsSemaphore;
         private readonly IServerLog? _log;
         private bool _canRun;
         private readonly HttpServerConfiguration _configuration;
         private readonly List<IRequestHandler> _handlers;
+
+        private int FreeClientSlots;
 
         /// <summary>
         /// Predicate that can be used to impelement whitelist or blaclist
@@ -43,7 +43,8 @@ namespace Webmaster442.HttpServerFramework
             _configuration = configuration;
             _log = log;
             _handlers = new List<IRequestHandler>();
-            _clientsSemaphore = new Semaphore(0, _configuration.MaxClients);
+            FreeClientSlots = configuration.MaxClients;
+            _listner = new TcpListener(configuration.ListenAdress, configuration.Port);
         }
 
         /// <summary>
@@ -58,11 +59,6 @@ namespace Webmaster442.HttpServerFramework
         /// <inheritdoc/>
         public void Dispose()
         {
-            if (_clientsSemaphore != null)
-            {
-                _clientsSemaphore.Dispose();
-                _clientsSemaphore = null;
-            }
             Stop();
             _listner = null;
             foreach (var handler in _handlers)
@@ -81,6 +77,7 @@ namespace Webmaster442.HttpServerFramework
         {
             if (_handlers.Count < 1)
                 throw new InvalidOperationException("No request handlers are configured");
+            _canRun = true;
             StartPrivate();
         }
 
@@ -92,10 +89,9 @@ namespace Webmaster442.HttpServerFramework
             _listner?.Start();
             while (_canRun && _listner != null)
             {
+                using TcpClient client = await _listner.AcceptTcpClientAsync();
                 try
                 {
-                    TcpClient client = await _listner.AcceptTcpClientAsync();
-
                     if (ClientFilteringPredicate != null)
                     {
                         _log?.Info("Running {0} ...", nameof(ClientFilteringPredicate));
@@ -104,13 +100,15 @@ namespace Webmaster442.HttpServerFramework
                         {
                             _log?.Warning("{0} returned false. Refusing client connection", nameof(ClientFilteringPredicate));
                             client?.Dispose();
+                            continue;
                         }
                     }
-                   
-                    if (_clientsSemaphore?.WaitOne(100) == true)
+
+                    if (FreeClientSlots > 0)
                     {
-                        await HandleClient(client!);
-                        _clientsSemaphore.Release();
+                        System.Threading.Interlocked.Decrement(ref FreeClientSlots);
+                        await HandleClient(client);
+                        System.Threading.Interlocked.Increment(ref FreeClientSlots);
                     }
                     else
                     {
@@ -139,48 +137,45 @@ namespace Webmaster442.HttpServerFramework
         {
             await Task.Yield();
             var parser = new RequestParser(_configuration.MaxPostSize);
-            using (client)
+            using var stream = client.GetStream();
+            HttpResponse response = new HttpResponse(stream);
+            try
             {
-                using var stream = client.GetStream();
-                HttpResponse response = new HttpResponse(stream);
-                try
+                HttpRequest request = parser.ParseRequest(stream);
+
+                bool wasHandled = false;
+                foreach (var handler in _handlers)
                 {
-                    HttpRequest request = parser.ParseRequest(stream);
-
-                    bool wasHandled = false;
-                    foreach (var handler in _handlers)
+                    bool result = await handler.Handle(_log, request, response);
+                    if (result)
                     {
-                        bool result = await handler.Handle(_log, request, response);
-                        if (result)
-                        {
-                            wasHandled = true;
-                            break;
-                        }
-                    }
-
-                    if (!wasHandled)
-                    {
-                        throw new ServerException(HttpResponseCode.NotFound);
+                        wasHandled = true;
+                        break;
                     }
                 }
-                catch (Exception ex)
-                {
-                    if (ex is ServerException serverException)
-                    {
-                        _log?.Warning(serverException.Message);
-                        await ServeErrorHandler(response, serverException.ResponseCode);
 
-                    }
-                    else
-                    {
-                        _log?.Critical(ex);
-                        await ServeInternalServerError(response, ex);
-                    }
+                if (!wasHandled)
+                {
+                    throw new ServerException(HttpResponseCode.NotFound);
+                }
+            }
+            catch (Exception ex)
+            {
+                if (ex is ServerException serverException)
+                {
+                    _log?.Warning(serverException.Message);
+                    await ServeErrorHandler(response, serverException.ResponseCode);
+
+                }
+                else
+                {
+                    _log?.Critical(ex);
+                    await ServeInternalServerError(response, ex);
                 }
             }
         }
 
-        private async Task ServeInternalServerError(HttpResponse response, Exception ex)
+        private async ValueTask ServeInternalServerError(HttpResponse response, Exception ex)
         {
             HtmlBuilder builder = new HtmlBuilder("Internal server error");
             builder.AppendParagraph("Internal server error happened");
@@ -194,7 +189,7 @@ namespace Webmaster442.HttpServerFramework
             await response.Write(builder.ToString());
         }
 
-        private async Task ServeErrorHandler(HttpResponse response, HttpResponseCode responseCode)
+        private async ValueTask ServeErrorHandler(HttpResponse response, HttpResponseCode responseCode)
         {
             response.ResponseCode = responseCode;
             response.ContentType = "text/html";

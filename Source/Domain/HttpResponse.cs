@@ -78,7 +78,7 @@ namespace Webmaster442.HttpServerFramework.Domain
         /// </summary>
         /// <param name="text">Text to write</param>
         /// <returns>an awaitable task</returns>
-        public async Task Write(string text)
+        public async ValueTask Write(string text)
         {
             var txt = Encoding.UTF8.GetBytes(text);
             var headers = Encoding.UTF8.GetBytes(PrepareHeaders(txt.Length));
@@ -97,7 +97,7 @@ namespace Webmaster442.HttpServerFramework.Domain
         /// </summary>
         /// <param name="data">a stream containing the data</param>
         /// <returns>an awaitable task</returns>
-        public async Task Write(Stream data)
+        public async ValueTask Write(Stream data)
         {
             var headers = Encoding.UTF8.GetBytes(PrepareHeaders(data.Length));
             if (_stream != null)
@@ -115,7 +115,7 @@ namespace Webmaster442.HttpServerFramework.Domain
         /// </summary>
         /// <param name="data">data to write</param>
         /// <returns>an awaitable task</returns>
-        public async Task Write(byte[] data)
+        public async ValueTask Write(byte[] data)
         {
             var headers = Encoding.UTF8.GetBytes(PrepareHeaders(data.Length));
             if (_stream != null)
@@ -135,7 +135,7 @@ namespace Webmaster442.HttpServerFramework.Domain
         /// <param name="input">input object</param>
         /// <param name="options">Serializer options</param>
         /// <returns>an awaitable task</returns>
-        public async Task WriteJson<T>(T input, JsonSerializerOptions? options = null)
+        public async ValueTask WriteJson<T>(T input, JsonSerializerOptions? options = null)
         {
             string serialized = JsonSerializer.Serialize(input, options);
             ContentType = "application/json";
@@ -147,7 +147,7 @@ namespace Webmaster442.HttpServerFramework.Domain
         /// <param name="serializer">XML serializer to use for the data</param>
         /// <param name="data">Data to write</param>
         /// <returns>an awaitable task</returns>
-        public async Task WriteXml(XmlSerializer serializer, object data)
+        public async ValueTask WriteXml(XmlSerializer serializer, object data)
         {
             ContentType = "application/xml";
             using (var ms = new MemoryStream())
