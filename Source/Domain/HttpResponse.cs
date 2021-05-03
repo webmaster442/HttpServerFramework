@@ -104,7 +104,15 @@ namespace Webmaster442.HttpServerFramework.Domain
             {
 #pragma warning disable RCS1090 // Add call to 'ConfigureAwait' (or vice versa).
                 await _stream.WriteAsync(headers);
-                await data.CopyToAsync(_stream);
+
+                byte[] buffer = new byte[4096];
+                int read = 0;
+                do
+                {
+                    read = data.Read(buffer, 0, buffer.Length);
+                    await _stream.WriteAsync(buffer, 0, read);
+                }
+                while (read > 0);
                 await _stream.WriteAsync(end);
 #pragma warning restore RCS1090 // Add call to 'ConfigureAwait' (or vice versa).
             }

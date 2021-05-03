@@ -68,7 +68,7 @@ namespace Webmaster442.HttpServerFramework.Handlers
                 var fileOnDisk = Path.Combine(_path, filename);
                 if (string.IsNullOrEmpty(filename))
                 {
-                    fileOnDisk = GetIndexFile(_mountPath);
+                    fileOnDisk = GetIndexFile(fileOnDisk);
                 }
 
                 if (Directory.Exists(fileOnDisk))
@@ -80,8 +80,9 @@ namespace Webmaster442.HttpServerFramework.Handlers
                 {
                     using (var stream = File.OpenRead(fileOnDisk))
                     {
-                        log?.Info("Serving {1}...", request.Url);
+                        log?.Info("Serving {0}...", request.Url);
                         response.ContentType = MimeTypes.GetMimeTypeForFile(fileOnDisk);
+                        response.ResponseCode = HttpResponseCode.Ok;
                         await response.Write(stream);
                     }
                     return true;

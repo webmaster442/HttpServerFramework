@@ -156,7 +156,7 @@ namespace Webmaster442.HttpServerFramework
 
                 if (!wasHandled)
                 {
-                    throw new ServerException(HttpResponseCode.NotFound);
+                    throw new ServerException(HttpResponseCode.NotFound, request.Url);
                 }
             }
             catch (Exception ex)
@@ -177,6 +177,8 @@ namespace Webmaster442.HttpServerFramework
 
         private async ValueTask ServeInternalServerError(HttpResponse response, Exception ex)
         {
+            response.ResponseCode = HttpResponseCode.InternalServerError;
+            response.ContentType = "text/html";
             HtmlBuilder builder = new HtmlBuilder("Internal server error");
             builder.AppendParagraph("Internal server error happened");
             if (_configuration.DebugMode)

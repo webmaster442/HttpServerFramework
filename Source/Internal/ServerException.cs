@@ -15,14 +15,28 @@ namespace Webmaster442.HttpServerFramework
     internal class ServerException: Exception
     {
         public HttpResponseCode ResponseCode { get; }
+        public string Url { get; }
 
         /// <summary>
         /// Creates a new instance of server exception
         /// </summary>
         /// <param name="responseCode">Response code describing the issue</param>
-        public ServerException(HttpResponseCode responseCode) : base($"{(int)responseCode}: {responseCode}")
+        public ServerException(HttpResponseCode responseCode) 
+            : base($"{(int)responseCode}: {responseCode}")
         {
             ResponseCode = responseCode;
+        }
+
+        /// <summary>
+        /// Creates a new instance of server exception
+        /// </summary>
+        /// <param name="responseCode">Response code describing the issue</param>
+        /// <param name="url">Invoker url</param>
+        public ServerException(HttpResponseCode responseCode, string url)
+            : base($"{(int)responseCode}: {responseCode} - {url}")
+        {
+            ResponseCode = responseCode;
+            Url = url;
         }
     }
 }

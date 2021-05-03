@@ -5,12 +5,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Webmaster442.HttpServerFramework.Domain
 {
     /// <summary>
     /// Represents a HTTP Request header
     /// </summary>
+    [DebuggerDisplay("{Method} {Url}")]
     public sealed class HttpRequest
     {
         /// <summary>
