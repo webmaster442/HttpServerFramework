@@ -25,6 +25,7 @@ namespace Webmaster442.HttpServerFramework
             : base($"{(int)responseCode}: {responseCode}")
         {
             ResponseCode = responseCode;
+            Url = string.Empty;
         }
 
         /// <summary>

@@ -58,7 +58,7 @@ namespace Webmaster442.HttpServerFramework.Handlers
         /// <param name="parameters">Request parameters</param>
         /// <param name="responseObject">Response object that will be JSON serialized</param>
         /// <returns>True, if processing was succesfull, false if not</returns>
-        protected abstract Task<bool> TryProcessRequest(IServerLog log, string url, IReadOnlyDictionary<string, string> parameters, out TResponse responseObject);
+        protected abstract Task<bool> TryProcessRequest(IServerLog? log, string url, IReadOnlyDictionary<string, string> parameters, out TResponse responseObject);
 
         /// <summary>
         /// Determines if the specified url can be processed by this handler

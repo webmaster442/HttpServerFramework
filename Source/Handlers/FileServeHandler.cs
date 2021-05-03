@@ -6,6 +6,8 @@
 using System.IO;
 using System.Threading.Tasks;
 using Webmaster442.HttpServerFramework.Domain;
+using Webmaster442.HttpServerFramework.Internal;
+using System.Linq;
 
 namespace Webmaster442.HttpServerFramework.Handlers
 {
@@ -16,6 +18,7 @@ namespace Webmaster442.HttpServerFramework.Handlers
     {
         private readonly string _path;
         private readonly string _mountPath;
+        private readonly bool _listFolders;
 
         /// <summary>
         /// List of files that are probed to serve, if the request is a folder;
@@ -27,10 +30,12 @@ namespace Webmaster442.HttpServerFramework.Handlers
         /// </summary>
         /// <param name="path">Path in the file system to serve from.</param>
         /// <param name="mountPath">Mount path on server</param>
-        public FileServeHandler(string path, string mountPath = "/")
+        /// <param name="listFolders">Allow listing of folders, if no index page is present</param>
+        public FileServeHandler(string path, bool listFolders, string mountPath = "/")
         {
             _path = path;
             _mountPath = mountPath;
+            _listFolders = listFolders;
             IndexFiles = new [] 
             {
                 "index.html",
@@ -38,6 +43,7 @@ namespace Webmaster442.HttpServerFramework.Handlers
                 "default.html",
                 "default.htm"
             };
+            
         }
 
         private string GetIndexFile(string _path)
@@ -49,6 +55,10 @@ namespace Webmaster442.HttpServerFramework.Handlers
                 {
                     return localindex;
                 }
+            }
+            if (_listFolders)
+            {
+                return _path;
             }
             throw new ServerException(HttpResponseCode.NotFound);
         }
@@ -76,6 +86,12 @@ namespace Webmaster442.HttpServerFramework.Handlers
                     fileOnDisk = GetIndexFile(fileOnDisk);
                 }
 
+                if (Directory.Exists(fileOnDisk) && _listFolders)
+                {
+                    await RenderFolder(fileOnDisk, request.Url, log, response);
+                    return true;
+                }
+
                 if (File.Exists(fileOnDisk))
                 {
                     using (var stream = File.OpenRead(fileOnDisk))
@@ -89,6 +105,40 @@ namespace Webmaster442.HttpServerFramework.Handlers
                 }
             }
             return false;
+        }
+
+        private async ValueTask RenderFolder(string folder, string url, IServerLog? log, HttpResponse response)
+        {
+            log?.Info("Rendering file list for: {0}...", folder);
+            string title = $"Index of {url}";
+
+            HtmlBuilder builder = new HtmlBuilder(title);
+            builder.AppendHeader(1, title);
+            builder.AppendHr();
+
+            builder.AppendParagraph("Directories:");
+
+            builder.UnorderedList(Directory.GetDirectories(folder), item =>
+            {
+                return $"<a href=\"{GetUrl(url, item)}\">{Path.GetFileName(item)}</a>";
+            });
+
+            builder.AppendParagraph("Files:");
+
+            builder.UnorderedList(Directory.GetFiles(folder), item =>
+            {
+                return $"<a href=\"{GetUrl(url, item)}\">{Path.GetFileName(item)}</a>";
+            });
+
+            response.ContentType = "text/html";
+            response.ResponseCode = HttpResponseCode.Ok;
+            await response.Write(builder.ToString());
+        }
+
+        private static string GetUrl(string baseUrl, string item)
+        {
+            var url = Path.Combine(baseUrl, Path.GetFileName(item));
+            return url.Replace('\\', '/');
         }
     }
 }

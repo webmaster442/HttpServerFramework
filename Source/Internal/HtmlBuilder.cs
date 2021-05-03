@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Webmaster442.HttpServerFramework.Internal
@@ -53,6 +54,18 @@ namespace Webmaster442.HttpServerFramework.Internal
         public void AppendPre(string text)
         {
             AppendElement("pre", text);
+        }
+
+        public void UnorderedList<T>(IEnumerable<T> enumerable, Func<T, string> itemSelector)
+        {
+            _content.AppendLine("<ul>");
+            foreach (var item in enumerable)
+            {
+                _content.Append("<li>");
+                _content.Append(itemSelector.Invoke(item));
+                _content.Append("</li>");
+            }
+            _content.AppendLine("</ul>");
         }
 
         private void CloseHtml()
