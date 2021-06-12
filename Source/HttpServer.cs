@@ -92,7 +92,7 @@ namespace Webmaster442.HttpServerFramework
                     if (ClientFilteringPredicate != null)
                     {
                         _log?.Info("Running {0} ...", nameof(ClientFilteringPredicate));
-                        bool canHandle = ClientFilteringPredicate?.Invoke(client) ?? false;
+                        bool canHandle = ClientFilteringPredicate.Invoke(client);
                         if (!canHandle)
                         {
                             _log?.Warning("{0} returned false. Refusing client connection", nameof(ClientFilteringPredicate));

@@ -42,10 +42,7 @@ namespace Webmaster442.HttpServerFramework.Internal
                 do
                 {
                     line = reader.ReadLine();
-                    if (string.IsNullOrEmpty(line))
-                    {
-                        break;
-                    }
+                    if (string.IsNullOrEmpty(line)) continue;
                     if (lineNumber == 0)
                     {
                         var methodUrlVersion = line.Split(' ');
