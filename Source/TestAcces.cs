@@ -6,5 +6,5 @@
 #if DEBUG
 using System.Runtime.CompilerServices;
 
-[assembly:InternalsVisibleTo("Webmaster442.HttpServer.Tests")]
+[assembly:InternalsVisibleTo("Webmaster442.HttpServerFramework.Tests")]
 #endif

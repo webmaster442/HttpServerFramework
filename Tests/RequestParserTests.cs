@@ -41,11 +41,15 @@ namespace Webmaster442.HttpServerFramework.Tests
                     Url = "/hello.htm",
                     Version = "HTTP/1.1",
                 });
-                yield return new TestCaseData("POST /hello.htm HTTP/1.1", new HttpRequest
+                yield return new TestCaseData("POST /hello.htm HTTP/1.1\r\nContent-Length: 0", new HttpRequest
                 {
                     Method = RequestMethod.Post,
                     Url = "/hello.htm",
                     Version = "HTTP/1.1",
+                    Headers = new Dictionary<string, string>
+                    {
+                        { KnownHeaders.ContentLength, "0" },
+                    }
                 });
             }
         }
