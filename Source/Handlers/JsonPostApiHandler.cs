@@ -1,10 +1,9 @@
 ﻿// ------------------------------------------------------------------------------------------------
-// Copyright (c) 2021 Ruzsinszki Gábor
+// Copyright (c) 2021-2022 Ruzsinszki Gábor
 // This is free software under the terms of the MIT License. https://opensource.org/licenses/MIT
 // -----------------------------------------------------------------------------------------------
 
 using System.Text.Json;
-using System.Threading.Tasks;
 using Webmaster442.HttpServerFramework.Domain;
 
 namespace Webmaster442.HttpServerFramework.Handlers

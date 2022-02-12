@@ -1,9 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <ImplicitUsings>true</ImplicitUsings>
     <DocumentationFile>E:\GIT\Webmaster442.HttpServer\Source\bin\Webmaster442.HttpServer.xml</DocumentationFile>
     <WarningsAsErrors>;NU1605;CS1591</WarningsAsErrors>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
