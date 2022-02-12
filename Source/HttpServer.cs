@@ -78,25 +78,25 @@ public sealed class HttpServer : IDisposable
         Task.Run(StartPrivate);
     }
 
-    private async Task StartPrivate()
-    {
-        _listner?.Start();
-        while (_canRun && _listner != null)
+        private async Task StartPrivate()
         {
-            using TcpClient client = await _listner.AcceptTcpClientAsync();
-            try
+            _listner?.Start();
+            while (_canRun && _listner != null)
             {
-                if (ClientFilteringPredicate != null)
+                using TcpClient client = await _listner.AcceptTcpClientAsync();
+                try
                 {
-                    _log?.Info("Running {0} ...", nameof(ClientFilteringPredicate));
-                    bool canHandle = ClientFilteringPredicate?.Invoke(client) ?? false;
-                    if (!canHandle)
+                    if (ClientFilteringPredicate != null)
                     {
-                        _log?.Warning("{0} returned false. Refusing client connection", nameof(ClientFilteringPredicate));
-                        client?.Dispose();
-                        continue;
+                        _log?.Info("Running {0} ...", nameof(ClientFilteringPredicate));
+                        bool canHandle = ClientFilteringPredicate?.Invoke(client) ?? false;
+                        if (!canHandle)
+                        {
+                            _log?.Warning("{0} returned false. Refusing client connection", nameof(ClientFilteringPredicate));
+                            client?.Dispose();
+                            continue;
+                        }
                     }
-                }
 
                 if (FreeClientSlots > 0)
                 {
