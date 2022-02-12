@@ -14,7 +14,9 @@ namespace Webmaster442.HttpServerFramework.Handlers
     /// </summary>
     /// <typeparam name="TRequest">Request object type</typeparam>
     /// <typeparam name="TResponse">Response object tpye</typeparam>
-    public abstract class JsonPostApiHandler<TRequest, TResponse> : IRequestHandler
+    public abstract class JsonPostApiHandler<TRequest, TResponse> : IRequestHandler 
+        where TRequest: class, new()
+        where TResponse: class, new()
     {
         /// <summary>
         /// API supported HTTP method
